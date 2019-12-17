@@ -11,7 +11,7 @@
         </label>
         <label>
           Name:
-          <input type="text" class="form-control" v-model="name" />
+          <input type="text" class="form-control" v-model="name" @keyup.f2="add"/>
         </label>
         <!-- add() 添加（）后可以传参 -->
         <input
@@ -22,7 +22,7 @@
         />
         <label>
           搜索名称关键字:
-          <input type="text" class="form-control" v-model="keywords" />
+          <input type="text" class="form-control" v-model="keywords" v-focus v-color="'blue'"/>
         </label>
       </div>
     </div>
@@ -41,9 +41,9 @@
         <tr v-for="item in search(keywords)" :key="item.id">
           <td>{{ item.id }}</td>
           <td v-text="item.name"></td>
-          <td>{{ item.ctime }}</td>
+          <td>{{ item.ctime | dateFormat }}</td>
           <td>
-            <a href="" @click.prevent="del(item.id)">删除</a>
+            <a href="" @click.prevent="del(item.id)" v-fontweight="800" v-fontsize="'20px'">删除</a>
           </td>
         </tr>
       </tbody>
@@ -108,8 +108,39 @@ export default {
         }
       });
     }
+  },
+  // 定义私有（局部）过滤器 过滤器有两个条件 过滤器名称和处理函数 如果全局和私有重名 就近原则 调用私有
+  filters: {
+    dateFormat: function(dateStr, pattern = "") {
+      var dt = new Date(dateStr);
+      var y = dt.getFullYear();
+      var m = (dt.getMonth() + 1).toString().padStart(2, "0");
+      var d = dt.getDate().toString().padStart(2, "0");
+      if (pattern.toLowerCase() === "yyyy-mm-dd") {
+        return `${y}-${m}-${d}`;
+      } else {
+        var hh = dt.getHours().toString().padStart(2, "0");
+        var mm = dt.getMinutes().toString().padStart(2, "0");
+        var ss = dt.getSeconds().toString().padStart(2, "0");
+        return `${y}-${m}-${d} ${hh}:${mm}:${ss}~~~`;
+      }
+    }
+  },
+  // 自定义私有指令
+  directives: {
+    fontweight: {
+      bind: function(el, binding){
+        // console.log(binding.value);
+        el.style.fontWeight = binding.value;
+      }
+    },
+    // 简写模式 等同于同时写入 bind + updated
+    fontsize: function(el, binding) {
+      el.style.fontSize = parseInt(binding.value) + "px";
+    }
   }
 };
+// document.getElementById("search").focus();这里不能写js？
 </script>
 
 <style scoped></style>
